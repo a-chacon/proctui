@@ -32,7 +32,7 @@ A terminal user interface (TUI) for managing Procfile-based applications. `procm
 For now, you can install `procman` via [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html):
 
 ```bash
-cargo install procman
+cargo install proc-man
 ```
 
 (Releases and pre-compiled executables coming soon.)
