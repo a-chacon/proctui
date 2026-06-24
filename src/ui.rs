@@ -17,7 +17,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span, Text},
-    widgets::{Block, BorderType, Clear, Paragraph, Tabs, Widget},
+    widgets::{Block, BorderType, Clear, Paragraph, Tabs, Widget, Wrap},
 };
 
 use crate::app::App;
@@ -114,6 +114,7 @@ impl Widget for &App {
                 Line::from("  i              : [i]nteractive Mode"),
                 Line::from("  a              : Se[a]rch logs (highlights)"),
                 Line::from("  r              : Filte[r] logs (hides lines)"),
+                Line::from("  w              : Toggle line [w]rap"),
                 Line::from("  Delete         : Clear Search/Filter"),
                 Line::from(""),
                 Line::from(vec![Span::styled(
@@ -340,8 +341,16 @@ impl App {
                 log_text.lines.push(rendered_line);
             }
 
-            let height = inner_area.height as usize;
-            let max_scroll = log_text.lines.len().saturating_sub(height) as u16;
+            let mut paragraph = Paragraph::new(log_text);
+            if self.wrap {
+                paragraph = paragraph.wrap(Wrap { trim: false });
+            }
+
+            let height = inner_area.height;
+            let total_rows = paragraph
+                .line_count(inner_area.width)
+                .min(u16::MAX as usize) as u16;
+            let max_scroll = total_rows.saturating_sub(height);
 
             // If scroll is 0, we auto-scroll to the bottom.
             let current_scroll = if process.scroll == 0 {
@@ -350,9 +359,7 @@ impl App {
                 max_scroll.saturating_sub(process.scroll)
             };
 
-            Paragraph::new(log_text)
-                .scroll((current_scroll, 0))
-                .render(inner_area, buf);
+            paragraph.scroll((current_scroll, 0)).render(inner_area, buf);
         }
     }
 }
