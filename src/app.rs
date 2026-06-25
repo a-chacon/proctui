@@ -77,7 +77,7 @@ impl App {
             input_mode: InputMode::Normal,
             input_buffer: String::new(),
             show_help: false,
-            wrap: false,
+            wrap: true,
         }
     }
 
